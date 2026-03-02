@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# Second Brain
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A personal productivity app for taking notes and managing tasks, built with React and Supabase.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Notes** — Split-view layout with a note list on the left and a rich-text editor on the right. Supports bold, italic, headings, bullet lists, code blocks, blockquotes and more via TipTap. Notes autosave as you type and can be starred or tagged.
 
-## React Compiler
+**Tasks** — Kanban board with three columns: To Do, In Progress and Done. Cards can be reordered by dragging within a column and moved between columns. Each task has a title, description, priority level and tags.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Dashboard** — Overview page showing total notes, open tasks and a recent activity section.
 
-## Expanding the ESLint configuration
+**Auth** — Email and password sign-in and sign-up powered by Supabase Auth. All data is scoped to the signed-in user via Row Level Security.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React 18 with TypeScript
+- Vite
+- Tailwind CSS with shadcn/ui components
+- Zustand for state management
+- Supabase for database and authentication
+- TipTap for rich-text editing
+- dnd-kit for drag-and-drop
+- Framer Motion for animations
+- React Router v6
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Clone the repository and install dependencies.
+
+```
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Create a `.env` file in the root and add your Supabase credentials.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Start the development server.
+
+```
+npm run dev
+```
+
+## Database Setup
+
+Create the following tables in your Supabase project.
+
+**notes**
+
+| column | type |
+| --- | --- |
+| id | uuid, primary key |
+| user_id | uuid, references auth.users |
+| title | text |
+| content | text |
+| is_starred | boolean, default false |
+| tags | text[], default {} |
+| created_at | timestamptz, default now() |
+| updated_at | timestamptz, default now() |
+
+**tasks**
+
+| column | type |
+| --- | --- |
+| id | uuid, primary key |
+| user_id | uuid, references auth.users |
+| title | text |
+| description | text |
+| status | text (todo, in_progress, done) |
+| priority | text (low, medium, high) |
+| tags | text[], default {} |
+| position | integer, default 0 |
+| created_at | timestamptz, default now() |
+
+Enable Row Level Security on both tables and add policies so users can only read and write their own rows.
+
+## Project Structure
+
+```
+src/
+  components/layout/    shared layout (AppShell, Sidebar)
+  features/auth/        sign-in, sign-up, settings
+  features/dashboard/   dashboard page
+  features/notes/       note list, editor, store
+  features/tasks/       kanban board, store
+  lib/                  Supabase client, utilities
 ```
