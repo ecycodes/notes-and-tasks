@@ -1,0 +1,196 @@
+/* ============================================================
+   GLOBAL STYLES — Second Brain
+
+   Architecture:
+   - @layer base       → CSS reset + HSL design tokens (light & dark)
+   - @layer components → Reusable patterns (glassmorphism, scrollbar)
+   - @layer utilities  → One-off helpers not in Tailwind core
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*
+    Light theme — PRIMARY palette. App is light-first.
+    Design rationale:
+      background: warm white (not pure #fff) — softer on the eyes.
+      card: slightly off-white to create depth without heavy shadows.
+      primary: indigo-violet 258° — the signature accent of Second Brain.
+  */
+  :root {
+    --background: 240 20% 98%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+
+    /* Indigo-violet — the signature accent of Second Brain */
+    --primary: 258 90% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 10% 94%;
+    --secondary-foreground: 240 10% 20%;
+
+    --muted: 240 10% 94%;
+    --muted-foreground: 240 5% 50%;
+
+    --accent: 258 80% 95%;
+    --accent-foreground: 258 90% 40%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 10% 88%;
+    --input: 240 10% 88%;
+    --ring: 258 90% 60%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 258 90% 60%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  /*
+    Dark theme — secondary palette, toggled via JS.
+    background/card use 240° (blue-tinted black) not pure 0° black.
+    This is the "Linear trick" — it reads as premium, not harsh.
+  */
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 5.5%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 5.5%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 258 90% 66%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 258 90% 66%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  /* --- CSS Reset & base element styles --- */
+  * {
+    @apply border-border box-border;
+  }
+
+  html {
+    /* Prevent layout shift from scrollbar appearing/disappearing */
+    overflow-y: scroll;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    /*
+      font-feature-settings enables ligatures and contextual alternates in Geist.
+      This small detail separates "good" from "great" typography.
+    */
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Smooth focus rings — accessible without looking clunky */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Note title input — no focus border */
+  input[data-note-title]:focus,
+  input[data-note-title]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* TipTap / ProseMirror — remove ALL focus borders and selection outlines */
+  .ProseMirror,
+  .ProseMirror:focus,
+  .ProseMirror:focus-visible,
+  .tiptap,
+  .tiptap:focus,
+  .tiptap:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* ProseMirror selected-node outline (comes from prosemirror-view CSS) */
+  .ProseMirror-selectednode {
+    outline: none !important;
+  }
+
+  li.ProseMirror-selectednode::after {
+    border: none !important;
+  }
+
+  /* EditorContent wrapper div also gets the global focus-visible ring */
+  [data-radix-popper-content-wrapper]:focus-visible,
+  .ProseMirror-focused,
+  div[contenteditable]:focus,
+  div[contenteditable]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+@layer components {
+  /*
+    Glassmorphism utility — used on sidebar, modals, and floating panels.
+    Defined here (not inline) so it's reusable and consistent.
+    bg-card/60 = card color at 60% opacity, letting the background bleed through.
+    backdrop-blur-xl creates the frosted glass effect.
+  */
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-border/50;
+  }
+
+  /* Custom scrollbar — thin, dark, on-brand */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-muted-foreground/30;
+  }
+}
