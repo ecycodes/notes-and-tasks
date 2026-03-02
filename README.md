@@ -2,6 +2,8 @@
 
 A personal productivity app for taking notes and managing tasks, built with React and Supabase.
 
+This project is for educational purposes only. Commercial use is not permitted.
+
 ## Features
 
 **Notes** — Split-view layout with a note list on the left and a rich-text editor on the right. Supports bold, italic, headings, bullet lists, code blocks, blockquotes and more via TipTap. Notes autosave as you type and can be starred or tagged.
